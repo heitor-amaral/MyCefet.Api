@@ -53,11 +53,11 @@ namespace MyCefet.Api.Controllers
         /// <returns></returns>
         [HttpGet, Produces("application/json"), Route("UserInfo")]
         [ProducesResponseType(typeof(Student), (int)HttpStatusCode.OK), ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> GetUserInfoAsync([FromHeader(Name = "Username")] string username, [FromHeader(Name = "Password")] string password)
+        public async Task<IActionResult> GetUserInfoAsync([FromHeader(Name = "JSessionID")] string jsessionid, [FromHeader(Name = "Username")] string username, [FromHeader(Name = "Password")] string password)
         {
             try
             {
-                var student = _infoService.GetUserInfo(username, password);
+                var student = _infoService.GetUserInfo(jsessionid, username, password);
                 return Ok(student.Result);
 
             } catch (LoginFailException)
@@ -74,11 +74,11 @@ namespace MyCefet.Api.Controllers
         /// <returns></returns>
         [HttpGet, Produces("application/json"), Route("GradesReport")]
         [ProducesResponseType( (int)HttpStatusCode.OK)]
-        public IActionResult GetGradesReportAsync([FromHeader(Name = "Username")] string username, [FromHeader(Name = "Password")] string password)
+        public IActionResult GetGradesReportAsync([FromHeader(Name = "JSessionID")] string jsessionid, [FromHeader(Name = "Username")] string username, [FromHeader(Name = "Password")] string password)
         {
             try
             {
-                var gradesReport = _gradesService.GetAllGrades(username, password);
+                var gradesReport = _gradesService.GetAllGrades(jsessionid, username, password);
                 return Ok(gradesReport.Semester);
 
             } catch (LoginFailException)

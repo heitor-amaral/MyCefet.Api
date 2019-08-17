@@ -5,6 +5,6 @@ namespace MyCefet.Api.Interfaces
 {
     public interface IReportGradesService
     {
-        GradesReport GetAllGrades(string username, string password);
+        GradesReport GetAllGrades(string jsessionid, string username, string password);
     }
 }

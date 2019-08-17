@@ -6,6 +6,6 @@ namespace MyCefet.Api.Interfaces
 {
     public interface IInfoService
     {
-        Task<Student> GetUserInfo(string username, string password);
+        Task<Student> GetUserInfo(string jsessionid, string username, string password);
     }
 }

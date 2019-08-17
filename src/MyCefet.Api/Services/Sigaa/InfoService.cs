@@ -21,13 +21,14 @@ namespace MyCefet.Api.Services.Sigaa
             _loginService = loginService;
         }
 
-        public async Task<Student> GetUserInfo(string username, string password)
+        public async Task<Student> GetUserInfo(string jsessionid, string username, string password)
         {
             try
             {
-                string jsession = _loginService.GetJsession(username, password).Result;
+                if (jsessionid is null)
+                    jsessionid = _loginService.GetJsession(username, password).Result;
 
-                var student = ScraperInfo(GetInfoStudant(jsession));
+                var student = ScraperInfo(GetInfoStudant(jsessionid));
 
                 return student;
             }
@@ -57,7 +58,7 @@ namespace MyCefet.Api.Services.Sigaa
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
 
-            var name = htmlDocument.DocumentNode.SelectSingleNode(".//p[@class = 'info-docente']").InnerText.Replace("\n", "").Replace("\t", "").Trim();
+            var name = FixName(htmlDocument.DocumentNode.SelectSingleNode(".//p[@class = 'info-docente']").InnerText.Replace("\n", "").Replace("\t", "").Trim());
             var table = htmlDocument.DocumentNode.SelectNodes(".//div[@id = 'agenda-docente']/table/tr");
 
             Dictionary<string, string> infos = new Dictionary<string, string>();
@@ -69,22 +70,25 @@ namespace MyCefet.Api.Services.Sigaa
             var entrada = HttpUtility.HtmlDecode(table[5].SelectNodes(".//td")[1].InnerText).Replace("\n", "").Replace("\t", "").Trim();
             var rg = HttpUtility.HtmlDecode(table[8].SelectNodes(".//table/tr")[1].SelectNodes(".//td")[1].InnerText).Replace("\n", "").Replace("\t", "").Trim();
 
-            //infos.Add("Nome", name);
-            //infos.Add("Matricula", matricula);
-            //infos.Add("Curso", curso);
-            //infos.Add("Nivel", nivel);
-            //infos.Add("Status", status);
-            //infos.Add("Entrada", entrada);
-            //infos.Add("RG", rg);
-
-
-
-            //var entries = infos.Select(d =>
-            //    string.Format("\"{0}\": \"{1}\"", d.Key, string.Join(",", d.Value))
-            //);
-            //string json = JsonConvert.SerializeObject(infos).Replace("\\", "");
-
             return new Student(name, matricula, curso, nivel, status, entrada, rg);
+        }
+
+        private string FixName(string name)
+        {
+            name = name.ToLower();
+            var array = name.ToCharArray();
+            array[0] = char.ToUpper(array[0]);
+            for (int i = 1; i < array.Length; i++)  
+            {  
+                if (array[i - 1] == ' ')  
+                {  
+                    if (char.IsLower(array[i]))  
+                    {  
+                        array[i] = char.ToUpper(array[i]);  
+                    }  
+                }  
+            }  
+            return new string(array);  
         }
     }
 }

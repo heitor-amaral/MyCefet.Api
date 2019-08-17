@@ -19,13 +19,14 @@ namespace MyCefet.Api.Services.Sigaa
             _loginService = loginService;
         }
 
-        public GradesReport GetAllGrades(string username, string password)
+        public GradesReport GetAllGrades(string jsessionid, string username, string password)
         {
             try
             {
-                string jsession = _loginService.GetJsession(username, password).Result;
+                if (jsessionid is null)
+                    jsessionid = _loginService.GetJsession(username, password).Result;
 
-                var gradesReport = ScraperGrades(GetGrades(jsession));
+                var gradesReport = ScraperGrades(GetGrades(jsessionid));
 
                 return gradesReport;
             }
