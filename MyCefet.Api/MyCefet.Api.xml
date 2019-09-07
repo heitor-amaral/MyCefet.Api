@@ -12,7 +12,7 @@
             <param name="password"></param>
             <returns></returns>
         </member>
-        <member name="M:MyCefet.Api.Controllers.SigaaController.GetUserInfoAsync(System.String,System.String)">
+        <member name="M:MyCefet.Api.Controllers.SigaaController.GetUserInfoAsync(System.String,System.String,System.String)">
             <summary>
             This endpoint provides informations about a student through sigaa username and password
             </summary>
@@ -20,7 +20,7 @@
             <param name="password"></param>
             <returns></returns>
         </member>
-        <member name="M:MyCefet.Api.Controllers.SigaaController.GetGradesReportAsync(System.String,System.String)">
+        <member name="M:MyCefet.Api.Controllers.SigaaController.GetGradesReportAsync(System.String,System.String,System.String)">
             <summary>
             This endpoint provides all semesters' grades through sigaa username and password
             </summary>
