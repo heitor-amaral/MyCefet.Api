@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyCefet.Api.Interfaces;
 using MyCefet.Api.Models;
+using MyCefet.Api.Services.Sigaa.Interfaces;
 
 namespace MyCefet.Api.Controllers
 {
@@ -17,12 +18,14 @@ namespace MyCefet.Api.Controllers
         private readonly ILoginService _loginService;
         private readonly IInfoService _infoService;
         private readonly IReportGradesService _gradesService;
+        private readonly IVirtualClassService _virtualClassService;
 
-        public SigaaController(ILoginService loginService, IInfoService infoService, IReportGradesService gradesService)
+        public SigaaController(ILoginService loginService, IInfoService infoService, IReportGradesService gradesService, IVirtualClassService virtualClassService)
         {
             _loginService = loginService;
             _infoService = infoService;
             _gradesService = gradesService;
+            _virtualClassService = virtualClassService;
         }
 
         /// <summary>
@@ -37,7 +40,7 @@ namespace MyCefet.Api.Controllers
         {
             try
             {
-                string jsession = _loginService.GetJsession(username, password).Result;
+                string jsession = await _loginService.Login(username, password);
                 return Ok(jsession);
             } catch (LoginFailException)
             {
@@ -48,6 +51,7 @@ namespace MyCefet.Api.Controllers
         /// <summary>
         /// This endpoint provides informations about a student through sigaa username and password
         /// </summary>
+        /// <param name="jsessionid"></param>
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
@@ -57,8 +61,8 @@ namespace MyCefet.Api.Controllers
         {
             try
             {
-                var student = _infoService.GetUserInfo(jsessionid, username, password);
-                return Ok(student.Result);
+                var student = await _infoService.GetUserInfo(jsessionid, username, password);
+                return Ok(student);
 
             } catch (LoginFailException)
             {
@@ -69,6 +73,7 @@ namespace MyCefet.Api.Controllers
         /// <summary>
         /// This endpoint provides all semesters' grades through sigaa username and password
         /// </summary>
+        /// <param name="jsessionid"></param>
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
@@ -86,5 +91,28 @@ namespace MyCefet.Api.Controllers
                 return BadRequest("Login failed");
             }
         }
+
+        ///// <summary>
+        ///// This endpoint provides all semesters' grades through sigaa username and password
+        ///// </summary>
+        ///// <param name="jsessionid"></param>
+        ///// <param name="username"></param>
+        ///// <param name="password"></param>
+        ///// <returns></returns>
+        //[HttpGet, Produces("application/json"), Route("VirtualClassGrades")]
+        //[ProducesResponseType((int)HttpStatusCode.OK)]
+        //public IActionResult GetVirtualClassGrades([FromHeader(Name = "JSessionID")] string jsessionid, [FromHeader(Name = "Username")] string username, [FromHeader(Name = "Password")] string password)
+        //{
+        //    try
+        //    {
+        //        var gradesReport = _gradesService.GetAllGrades(jsessionid, username, password);
+        //        return Ok(gradesReport.Semester);
+
+        //    }
+        //    catch (LoginFailException)
+        //    {
+        //        return BadRequest("Login failed");
+        //    }
+        //}
     }
 }

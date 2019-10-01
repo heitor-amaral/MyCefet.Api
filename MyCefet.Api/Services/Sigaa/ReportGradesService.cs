@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using MyCefet.Api.Interfaces;
 using MyCefet.Api.Models;
+using MyCefet.Api.Services.Sigaa.Interfaces;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace MyCefet.Api.Services.Sigaa
             try
             {
                 if (jsessionid is null)
-                    jsessionid = _loginService.GetJsession(username, password).Result;
+                    jsessionid = _loginService.Login(username, password).Result;
 
                 var gradesReport = ScraperGrades(GetGrades(jsessionid));
 

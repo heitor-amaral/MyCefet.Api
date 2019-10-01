@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MyCefet.Api.Interfaces
+namespace MyCefet.Api.Services.Sigaa.Interfaces
 {
     public interface IInfoService
     {

@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using MyCefet.Api.Interfaces;
 using MyCefet.Api.Models;
+using MyCefet.Api.Services.Sigaa.Interfaces;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
@@ -26,7 +27,7 @@ namespace MyCefet.Api.Services.Sigaa
             try
             {
                 if (jsessionid is null)
-                    jsessionid = _loginService.GetJsession(username, password).Result;
+                    jsessionid = await _loginService.Login(username, password);
 
                 var student = ScraperInfo(GetInfoStudant(jsessionid));
 

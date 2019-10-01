@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using MyCefet.Api.Models;
 
-namespace MyCefet.Api.Interfaces
+namespace MyCefet.Api.Services.Sigaa.Interfaces
 {
     public interface IReportGradesService
     {

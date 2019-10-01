@@ -16,6 +16,7 @@
             <summary>
             This endpoint provides informations about a student through sigaa username and password
             </summary>
+            <param name="jsessionid"></param>
             <param name="username"></param>
             <param name="password"></param>
             <returns></returns>
@@ -24,6 +25,33 @@
             <summary>
             This endpoint provides all semesters' grades through sigaa username and password
             </summary>
+            <param name="jsessionid"></param>
+            <param name="username"></param>
+            <param name="password"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyCefet.Api.Controllers.SigaaController.GetVirtualClassGrades(System.String,System.String,System.String)">
+            <summary>
+            This endpoint provides all semesters' grades through sigaa username and password
+            </summary>
+            <param name="jsessionid"></param>
+            <param name="username"></param>
+            <param name="password"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyCefet.Api.Controllers.SinapseController.GetBalanceAsync(System.String,System.String)">
+            <summary>
+            This endpoint provides a jsession id throug sigaa username and password
+            </summary>
+            <param name="username"></param>
+            <param name="password"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MyCefet.Api.Controllers.SinapseController.GetBalanceAsync(System.String,System.String,System.String)">
+            <summary>
+            This endpoint provides informations about a student through sigaa username and password
+            </summary>
+            <param name="jsessionid"></param>
             <param name="username"></param>
             <param name="password"></param>
             <returns></returns>

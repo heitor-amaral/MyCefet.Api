@@ -1,5 +1,7 @@
 ﻿using HtmlAgilityPack;
+using MyCefet.Api.Interfaces;
 using MyCefet.Api.Models;
+using MyCefet.Api.Services.Sigaa.Interfaces;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -7,19 +9,25 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace MyCefet.Api.Interfaces
+namespace MyCefet.Api.Services.Sigaa
 {
-    public class VirtualClassService
+    public class VirtualClassService : IVirtualClassService
     {
         private readonly ILoginService _loginService;
 
-        public GradesReport GetAllGrades(string username, string password)
+        public VirtualClassService(ILoginService loginService)
+        {
+            _loginService = loginService;
+        }
+
+        public async Task<GradesReport> GetAllGrades(string jsessionid, string username, string password)
         {
             try
             {
-                string jsession = _loginService.GetJsession(username, password).Result;
+                if (jsessionid is null)
+                    jsessionid = await _loginService.Login(username, password);
 
-                var gradesReport = ScraperGrades(GetGrades(jsession));
+                var gradesReport = ScraperGrades(await GetGrades(jsessionid));
 
                 return gradesReport;
             }
@@ -29,10 +37,10 @@ namespace MyCefet.Api.Interfaces
             }
         }
 
-        private string GetGrades(String jsessionid)
+        private async Task<string> GetGrades(String jsessionid)
         {
             var client = new RestClient("https://sig.cefetmg.br/sigaa/portais/discente/discente.jsf");
-            var request = new RestRequest(Method.POST);
+            var request = new RestRequest(Method.GET);
             request.AddHeader("cache-control", "max-age=0");
             request.AddHeader("Accept-Encoding", "gzip, deflate, br");
             request.AddHeader("Cookie", "JSESSIONID=" + jsessionid);
@@ -41,8 +49,7 @@ namespace MyCefet.Api.Interfaces
             request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
             request.AddHeader("Connection", "keep-alive");
             request.AddHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3");
-            request.AddParameter("undefined", "menu%3Aform_menu_discente=menu%3Aform_menu_discente&id=167226&jscook_action=menu_form_menu_discente_j_id_jsp_161879646_98_menu%3AA%5D%23%7B%20relatorioNotasAluno.gerarRelatorio%20%7D&javax.faces.ViewState=j_id1", ParameterType.RequestBody);
-            IRestResponse response = client.Execute(request);
+            IRestResponse response = await client.ExecutePostTaskAsync(request);
             return response.Content;
         }
 
@@ -51,7 +58,7 @@ namespace MyCefet.Api.Interfaces
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
 
-            var tables = htmlDocument.DocumentNode.SelectNodes(".//div[@class = 'notas']/table");
+            var tables = htmlDocument.DocumentNode.SelectNodes(".//td[@class = 'descricao']");
 
             GradesReport report = null;
 
