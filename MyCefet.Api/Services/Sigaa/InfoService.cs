@@ -1,13 +1,11 @@
 ﻿using HtmlAgilityPack;
+using MyCefet.Api.Extensions;
 using MyCefet.Api.Interfaces;
 using MyCefet.Api.Models;
 using MyCefet.Api.Services.Sigaa.Interfaces;
-using Newtonsoft.Json;
 using RestSharp;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization.Formatters;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -16,6 +14,22 @@ namespace MyCefet.Api.Services.Sigaa
     public class InfoService : IInfoService
     {
         private readonly ILoginService _loginService;
+
+        private const string ACCEPT_ENC_HEADER_KEY = "Accept-Encoding";
+        private const string ACCEPT_ENC_HEADER_VALUE = "gzip, deflate, br";
+        private const string CACHE_HEADER_KEY = "Cache-Control";
+        private const string CACHE_HEADER_VALUE = "max-age=0";
+        private const string COOKIE_HEADER_KEY = "Cookie";
+        private const string COOKIE_HEADER_VALUE = "JSESSIONID=";
+        private const string HOST_HEADER_KEY = "Host";
+        private const string HOST_HEADER_VALUE = "sig.cefetmg.br";
+        private const string CONTENT_HEADER_KEY = "Content-Type";
+        private const string CONTENT_HEADER_VALUE = "application/x-www-form-urlencoded";
+        private const string CONNECTION_HEADER_KEY = "Connection";
+        private const string CONNECTION_HEADER_VALUE = "keep-alive";
+        private const string ACCEPT_HEADER_KEY = "Accept";
+        private const string ACCEPT_HEADER_VALUE = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3";
+        private const string SIGAA_STUDENT_PORTAL_URL = "https://sig.cefetmg.br/sigaa/portais/discente/discente.jsf";
 
         public InfoService(ILoginService loginService)
         {
@@ -41,16 +55,23 @@ namespace MyCefet.Api.Services.Sigaa
 
         private string GetInfoStudant(String jsessionid)
         {
-            var client = new RestClient("https://sig.cefetmg.br/sigaa/portais/discente/discente.jsf");
+            var client = new RestClient(SIGAA_STUDENT_PORTAL_URL);
+
+            var studentInfoHeaders = new Dictionary<string, string>
+            {
+                {ACCEPT_ENC_HEADER_KEY, ACCEPT_ENC_HEADER_VALUE },
+                {CACHE_HEADER_KEY, CACHE_HEADER_VALUE },
+                {COOKIE_HEADER_KEY, COOKIE_HEADER_VALUE + jsessionid },
+                { HOST_HEADER_KEY, HOST_HEADER_VALUE},
+                {CONTENT_HEADER_KEY, CONTENT_HEADER_VALUE },
+                {CONNECTION_HEADER_KEY, CONNECTION_HEADER_VALUE },
+                {ACCEPT_HEADER_KEY, ACCEPT_HEADER_VALUE }
+            };
+
             var request = new RestRequest(Method.GET);
-            request.AddHeader("Accept-Encoding", "gzip, deflate, br");
-            request.AddHeader("Cache-Control", "max-age=0");
-            request.AddHeader("Cookie", "JSESSIONID=" + jsessionid);
-            request.AddHeader("Host", "sig.cefetmg.br");
-            request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
-            request.AddHeader("Connection", "keep-alive");
-            request.AddHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3");
+            request.SetRequestHeaders(studentInfoHeaders);
             IRestResponse response = client.Execute(request);
+
             return response.Content;
         }
 
@@ -79,17 +100,17 @@ namespace MyCefet.Api.Services.Sigaa
             name = name.ToLower();
             var array = name.ToCharArray();
             array[0] = char.ToUpper(array[0]);
-            for (int i = 1; i < array.Length; i++)  
-            {  
-                if (array[i - 1] == ' ')  
-                {  
-                    if (char.IsLower(array[i]))  
-                    {  
-                        array[i] = char.ToUpper(array[i]);  
-                    }  
-                }  
-            }  
-            return new string(array);  
+            for (int i = 1; i < array.Length; i++)
+            {
+                if (array[i - 1] == ' ')
+                {
+                    if (char.IsLower(array[i]))
+                    {
+                        array[i] = char.ToUpper(array[i]);
+                    }
+                }
+            }
+            return new string(array);
         }
     }
 }

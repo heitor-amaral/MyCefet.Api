@@ -56,9 +56,9 @@ namespace MyCefet.Api
                     });
 
                 // Set the comments path for the Swagger JSON and UI.
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
+               // var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+               // var xmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, xmlFile);
+              //  c.IncludeXmlComments(xmlPath);
             });
         }
 
