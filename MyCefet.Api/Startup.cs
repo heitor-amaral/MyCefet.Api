@@ -1,20 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using Lime.Protocol.Serialization.Newtonsoft;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.PlatformAbstractions;
 using MyCefet.Api.Services.Sigaa;
 using MyCefet.Api.Services.Sigaa.Interfaces;
+using MyCefet.Api.Settings;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace MyCefet.Api
@@ -27,6 +19,7 @@ namespace MyCefet.Api
         }
 
         public IConfiguration Configuration { get; }
+        private const string SETTINGS_SECTION = "Settings";
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -38,6 +31,16 @@ namespace MyCefet.Api
             services.AddSingleton<IVirtualClassService, VirtualClassService>();
             services.AddSingleton<Services.Sinapse.Interfaces.ILoginService, Services.Sinapse.LoginService>();
             services.AddSingleton<Services.Sinapse.Interfaces.ILunchBalanceService, Services.Sinapse.LunchBalanceService>();
+
+            // Parsing appsettings into class
+            var settings = Configuration.Get<MySettings>();
+
+            //Adding Requests Settings singleton
+            services.AddSingleton(settings);
+            services.AddSingleton(new LoginRequestSettings(settings.Settings.RequestSettings));
+            services.AddSingleton(new StudentInfoRequestSettings(settings.Settings.RequestSettings));
+            services.AddSingleton(new GradesRequestSettings(settings.Settings.RequestSettings));
+            services.AddSingleton(new VirtualClassRequestSettings(settings.Settings.RequestSettings));
 
             // Configurando o serviço de documentação do Swagger
             services.AddSwaggerGen(c =>
@@ -56,9 +59,9 @@ namespace MyCefet.Api
                     });
 
                 // Set the comments path for the Swagger JSON and UI.
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
+                // var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                // var xmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, xmlFile);
+                //  c.IncludeXmlComments(xmlPath);
             });
         }
 

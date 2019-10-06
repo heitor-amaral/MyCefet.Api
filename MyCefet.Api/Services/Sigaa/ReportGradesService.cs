@@ -1,12 +1,10 @@
 ﻿using HtmlAgilityPack;
+using MyCefet.Api.Extensions;
 using MyCefet.Api.Interfaces;
 using MyCefet.Api.Models;
 using MyCefet.Api.Services.Sigaa.Interfaces;
+using MyCefet.Api.Settings;
 using RestSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Web;
 
 namespace MyCefet.Api.Services.Sigaa
@@ -14,10 +12,12 @@ namespace MyCefet.Api.Services.Sigaa
     public class ReportGradesService : IReportGradesService
     {
         private readonly ILoginService _loginService;
+        private readonly GradesRequestSettings _gradesRequestSettings;
 
-        public ReportGradesService(ILoginService loginService)
+        public ReportGradesService(ILoginService loginService, GradesRequestSettings gradesRequestSettings)
         {
             _loginService = loginService;
+            _gradesRequestSettings = gradesRequestSettings;
         }
 
         public GradesReport GetAllGrades(string jsessionid, string username, string password)
@@ -37,24 +37,23 @@ namespace MyCefet.Api.Services.Sigaa
             }
         }
 
-        private string GetGrades(String jsessionid)
+        private string GetGrades(string jsessionid)
         {
-            var client = new RestClient("https://sig.cefetmg.br/sigaa/portais/discente/discente.jsf");
+            var client = new RestClient(_gradesRequestSettings.SigaaStudentPortalUrl);
             var request = new RestRequest(Method.POST);
-            request.AddHeader("cache-control", "max-age=0");
-            request.AddHeader("Accept-Encoding", "gzip, deflate, br");
-            request.AddHeader("Cookie", "JSESSIONID=" + jsessionid);
-            request.AddHeader("Referer", "https://sig.cefetmg.br/sigaa/portais/discente/discente.jsf");
-            request.AddHeader("Host", "sig.cefetmg.br");
-            request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
-            request.AddHeader("Connection", "keep-alive");
-            request.AddHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3");
-            request.AddParameter("undefined", "menu%3Aform_menu_discente=menu%3Aform_menu_discente&id=167226&jscook_action=menu_form_menu_discente_j_id_jsp_161879646_98_menu%3AA%5D%23%7B%20relatorioNotasAluno.gerarRelatorio%20%7D&javax.faces.ViewState=j_id1", ParameterType.RequestBody);
+            
+            var gradesRequestHeaders = _gradesRequestSettings.GetHeaderDict();
+            gradesRequestHeaders.AddValueToHeader("Cookie", jsessionid);
+
+            request.SetRequestHeaders(gradesRequestHeaders);
+            request.AddParameter("undefined", _gradesRequestSettings.GradesUndefinedParameter, ParameterType.RequestBody);
+
             IRestResponse response = client.Execute(request);
+            
             return response.Content;
         }
 
-        private GradesReport ScraperGrades(String html)
+        private GradesReport ScraperGrades(string html)
         {
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
