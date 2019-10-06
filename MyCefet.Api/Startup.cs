@@ -36,16 +36,11 @@ namespace MyCefet.Api
             var settings = Configuration.Get<MySettings>();
 
             //Adding Requests Settings singleton
-            services.AddMvc().AddJsonOptions(options =>
-            {
-                foreach (var settingsConverter in JsonNetSerializer.Settings.Converters)
-                {
-                    options.SerializerSettings.Converters.Add(settingsConverter);
-                }
-            });
             services.AddSingleton(settings);
-            services.AddSingleton(settings.Settings.RequestSettings);
             services.AddSingleton(new LoginRequestSettings(settings.Settings.RequestSettings));
+            services.AddSingleton(new StudentInfoRequestSettings(settings.Settings.RequestSettings));
+            services.AddSingleton(new GradesRequestSettings(settings.Settings.RequestSettings));
+            services.AddSingleton(new VirtualClassRequestSettings(settings.Settings.RequestSettings));
 
             // Configurando o serviço de documentação do Swagger
             services.AddSwaggerGen(c =>

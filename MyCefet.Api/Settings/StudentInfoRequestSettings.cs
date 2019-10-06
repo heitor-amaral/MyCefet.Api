@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MyCefet.Api.Settings
 {
-    public class LoginRequestSettings : BaseRequestSettings
+    public class StudentInfoRequestSettings: BaseRequestSettings
     {
+
 
         public string AcceptEncodeHeaderKey { get; set; }
         public string AcceptEncodeHeaderValue { get; set; }
         public string CacheHeaderKey { get; set; }
         public string CacheHeaderValue { get; set; }
-        public string RefererHeaderKey { get; set; }
-        public string RefererHeaderValue { get; set; }
         public string CookieHeaderKey { get; set; }
         public string CookieHeaderValue { get; set; }
         public string HostHeaderKey { get; set; }
@@ -22,23 +23,19 @@ namespace MyCefet.Api.Settings
         public string ContentHeaderValue { get; set; }
         public string AcceptHeaderKey { get; set; }
         public string AcceptHeaderValue { get; set; }
-        public string SigaaLogonUrl { get; set; }
-        public string SigaaBaseUrl { get; set; }
-        public string LoginParameterInit { get; set; }
+        public string SigaaStudentPortalUrl { get; set; }
 
         private readonly RequestSettings _requestSettings;
 
 
-        public LoginRequestSettings(RequestSettings requestSettings)
+        public StudentInfoRequestSettings(RequestSettings requestSettings)
         {
             _requestSettings = requestSettings;
 
             AcceptEncodeHeaderKey = _requestSettings.AcceptEncodeHeaderKey;
             AcceptEncodeHeaderValue = _requestSettings.AcceptEncodeHeaderValue;
             CacheHeaderKey = _requestSettings.CacheHeaderKey;
-            CacheHeaderValue = _requestSettings.LoginCacheHeaderValue;
-            RefererHeaderKey = _requestSettings.RefererHeaderKey;
-            RefererHeaderValue = _requestSettings.RefererHeaderValue;
+            CacheHeaderValue = _requestSettings.CacheHeaderValue;
             CookieHeaderKey = _requestSettings.CookieHeaderKey;
             CookieHeaderValue = _requestSettings.CookieHeaderValue;
             HostHeaderKey = _requestSettings.HostHeaderKey;
@@ -49,9 +46,7 @@ namespace MyCefet.Api.Settings
             ContentHeaderValue = _requestSettings.ContentHeaderValue;
             AcceptHeaderKey = _requestSettings.AcceptHeaderKey;
             AcceptHeaderValue = _requestSettings.AcceptHeaderValue;
-            SigaaLogonUrl = _requestSettings.SigaaLogonUrl;
-            SigaaBaseUrl = _requestSettings.SigaaBaseUrl;
-            LoginParameterInit = _requestSettings.LoginParameterInit;
+            SigaaStudentPortalUrl = _requestSettings.SigaaStudentPortalUrl;
 
         }
 
@@ -61,7 +56,6 @@ namespace MyCefet.Api.Settings
             {
                 { AcceptEncodeHeaderKey, AcceptEncodeHeaderValue },
                 { CacheHeaderKey, CacheHeaderValue },
-                { RefererHeaderKey, RefererHeaderValue },
                 { CookieHeaderKey, CookieHeaderValue },
                 { HostHeaderKey, HostHeaderValue },
                 { ConnectionHeaderKey,ConnectionHeaderValue },
@@ -71,3 +65,4 @@ namespace MyCefet.Api.Settings
         }
     }
 }
+

@@ -1,7 +1,9 @@
 ﻿using HtmlAgilityPack;
+using MyCefet.Api.Extensions;
 using MyCefet.Api.Interfaces;
 using MyCefet.Api.Models;
 using MyCefet.Api.Services.Sigaa.Interfaces;
+using MyCefet.Api.Settings;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -14,10 +16,12 @@ namespace MyCefet.Api.Services.Sigaa
     public class VirtualClassService : IVirtualClassService
     {
         private readonly ILoginService _loginService;
+        private readonly VirtualClassRequestSettings _virtualClassRequestSettings;
 
-        public VirtualClassService(ILoginService loginService)
+        public VirtualClassService(ILoginService loginService, VirtualClassRequestSettings virtualClassRequestSettings)
         {
             _loginService = loginService;
+            _virtualClassRequestSettings = virtualClassRequestSettings;
         }
 
         public async Task<GradesReport> GetAllGrades(string jsessionid, string username, string password)
@@ -39,17 +43,14 @@ namespace MyCefet.Api.Services.Sigaa
 
         private async Task<string> GetGrades(String jsessionid)
         {
-            var client = new RestClient("https://sig.cefetmg.br/sigaa/portais/discente/discente.jsf");
+            var client = new RestClient(_virtualClassRequestSettings.SigaaStudentPortalUrl);
             var request = new RestRequest(Method.GET);
-            request.AddHeader("cache-control", "max-age=0");
-            request.AddHeader("Accept-Encoding", "gzip, deflate, br");
-            request.AddHeader("Cookie", "JSESSIONID=" + jsessionid);
-            request.AddHeader("Referer", "https://sig.cefetmg.br/sigaa/portais/discente/discente.jsf");
-            request.AddHeader("Host", "sig.cefetmg.br");
-            request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
-            request.AddHeader("Connection", "keep-alive");
-            request.AddHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3");
+
+            var virtualClassRequestHeaders = _virtualClassRequestSettings.GetHeaderDict();
+            virtualClassRequestHeaders.AddValueToHeader("Cookie", jsessionid);
+            
             IRestResponse response = await client.ExecutePostTaskAsync(request);
+
             return response.Content;
         }
 

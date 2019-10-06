@@ -3,6 +3,7 @@ using MyCefet.Api.Extensions;
 using MyCefet.Api.Interfaces;
 using MyCefet.Api.Models;
 using MyCefet.Api.Services.Sigaa.Interfaces;
+using MyCefet.Api.Settings;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -31,9 +32,12 @@ namespace MyCefet.Api.Services.Sigaa
         private const string ACCEPT_HEADER_VALUE = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3";
         private const string SIGAA_STUDENT_PORTAL_URL = "https://sig.cefetmg.br/sigaa/portais/discente/discente.jsf";
 
-        public InfoService(ILoginService loginService)
+        private readonly StudentInfoRequestSettings _studentInforRequestSettings;
+
+        public InfoService(ILoginService loginService, StudentInfoRequestSettings studentInforRequestSettings)
         {
             _loginService = loginService;
+            _studentInforRequestSettings = studentInforRequestSettings;
         }
 
         public async Task<Student> GetUserInfo(string jsessionid, string username, string password)
@@ -55,18 +59,10 @@ namespace MyCefet.Api.Services.Sigaa
 
         private string GetInfoStudant(String jsessionid)
         {
-            var client = new RestClient(SIGAA_STUDENT_PORTAL_URL);
+            var client = new RestClient(_studentInforRequestSettings.SigaaStudentPortalUrl);
 
-            var studentInfoHeaders = new Dictionary<string, string>
-            {
-                {ACCEPT_ENC_HEADER_KEY, ACCEPT_ENC_HEADER_VALUE },
-                {CACHE_HEADER_KEY, CACHE_HEADER_VALUE },
-                {COOKIE_HEADER_KEY, COOKIE_HEADER_VALUE + jsessionid },
-                { HOST_HEADER_KEY, HOST_HEADER_VALUE},
-                {CONTENT_HEADER_KEY, CONTENT_HEADER_VALUE },
-                {CONNECTION_HEADER_KEY, CONNECTION_HEADER_VALUE },
-                {ACCEPT_HEADER_KEY, ACCEPT_HEADER_VALUE }
-            };
+            var studentInfoHeaders = _studentInforRequestSettings.GetHeaderDict();
+            studentInfoHeaders.AddValueToHeader("Cookie", jsessionid);
 
             var request = new RestRequest(Method.GET);
             request.SetRequestHeaders(studentInfoHeaders);
@@ -90,9 +86,9 @@ namespace MyCefet.Api.Services.Sigaa
             var nivel = HttpUtility.HtmlDecode(table[2].SelectNodes(".//td")[1].InnerText).Replace("\n", "").Replace("\t", "").Trim();
             var status = HttpUtility.HtmlDecode(table[3].SelectNodes(".//td")[1].InnerText).Replace("\n", "").Replace("\t", "").Trim();
             var entrada = HttpUtility.HtmlDecode(table[5].SelectNodes(".//td")[1].InnerText).Replace("\n", "").Replace("\t", "").Trim();
-            var rg = HttpUtility.HtmlDecode(table[8].SelectNodes(".//table/tr")[1].SelectNodes(".//td")[1].InnerText).Replace("\n", "").Replace("\t", "").Trim();
+            //var rg = HttpUtility.HtmlDecode(table[8].SelectNodes(".//table/tr")[1].SelectNodes(".//td")[1].InnerText).Replace("\n", "").Replace("\t", "").Trim();
 
-            return new Student(name, matricula, curso, nivel, status, entrada, rg);
+            return new Student(name, matricula, curso, nivel, status, entrada, "FATAL ERROR ON GETTING STUDENT'S RG NUMBER");
         }
 
         private string FixName(string name)

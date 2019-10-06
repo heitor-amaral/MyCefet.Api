@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MyCefet.Api.Settings
 {
-    public class LoginRequestSettings : BaseRequestSettings
+    public class GradesRequestSettings : BaseRequestSettings
     {
 
         public string AcceptEncodeHeaderKey { get; set; }
@@ -22,23 +24,22 @@ namespace MyCefet.Api.Settings
         public string ContentHeaderValue { get; set; }
         public string AcceptHeaderKey { get; set; }
         public string AcceptHeaderValue { get; set; }
-        public string SigaaLogonUrl { get; set; }
-        public string SigaaBaseUrl { get; set; }
-        public string LoginParameterInit { get; set; }
+        public string SigaaStudentPortalUrl { get; set; }
+        public string GradesUndefinedParameter { get; set; }
 
         private readonly RequestSettings _requestSettings;
 
 
-        public LoginRequestSettings(RequestSettings requestSettings)
+        public GradesRequestSettings(RequestSettings requestSettings)
         {
             _requestSettings = requestSettings;
 
             AcceptEncodeHeaderKey = _requestSettings.AcceptEncodeHeaderKey;
             AcceptEncodeHeaderValue = _requestSettings.AcceptEncodeHeaderValue;
             CacheHeaderKey = _requestSettings.CacheHeaderKey;
-            CacheHeaderValue = _requestSettings.LoginCacheHeaderValue;
+            CacheHeaderValue = _requestSettings.CacheHeaderValue;
             RefererHeaderKey = _requestSettings.RefererHeaderKey;
-            RefererHeaderValue = _requestSettings.RefererHeaderValue;
+            RefererHeaderValue = _requestSettings.SigaaStudentPortalUrl;
             CookieHeaderKey = _requestSettings.CookieHeaderKey;
             CookieHeaderValue = _requestSettings.CookieHeaderValue;
             HostHeaderKey = _requestSettings.HostHeaderKey;
@@ -49,10 +50,8 @@ namespace MyCefet.Api.Settings
             ContentHeaderValue = _requestSettings.ContentHeaderValue;
             AcceptHeaderKey = _requestSettings.AcceptHeaderKey;
             AcceptHeaderValue = _requestSettings.AcceptHeaderValue;
-            SigaaLogonUrl = _requestSettings.SigaaLogonUrl;
-            SigaaBaseUrl = _requestSettings.SigaaBaseUrl;
-            LoginParameterInit = _requestSettings.LoginParameterInit;
-
+            SigaaStudentPortalUrl = _requestSettings.SigaaStudentPortalUrl;
+            GradesUndefinedParameter = _requestSettings.GradesUndefinedParameter;
         }
 
         public override Dictionary<string, string> GetHeaderDict()
@@ -71,3 +70,4 @@ namespace MyCefet.Api.Settings
         }
     }
 }
+

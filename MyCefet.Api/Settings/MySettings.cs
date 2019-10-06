@@ -113,6 +113,9 @@ namespace MyCefet.Api.Settings
 
         [JsonProperty("LoginParameterInit")]
         public string LoginParameterInit { get; set; }
+
+        [JsonProperty("GradesUndefinedParameter")]
+        public string GradesUndefinedParameter { get; set; }
     }
 
     public abstract class BaseRequestSettings

@@ -10,14 +10,12 @@ namespace MyCefet.Api.Services.Sigaa
 {
     public class LoginService : ILoginService
     {
-
         private readonly LoginRequestSettings _loginRequestSettings;
 
         public LoginService(LoginRequestSettings loginRequestSettings)
         {
             _loginRequestSettings = loginRequestSettings;
         }
-
         private async Task<string> GetJSession()
         {
             try
@@ -41,8 +39,11 @@ namespace MyCefet.Api.Services.Sigaa
 
                 var client = new RestClient(_loginRequestSettings.SigaaLogonUrl);
                 var request = new RestRequest(Method.POST);
+                
+                var loginRequestHeaders = _loginRequestSettings.GetHeaderDict();
+                loginRequestHeaders.AddValueToHeader("Cookie", jsession);
 
-                request.SetRequestHeaders(_loginRequestSettings.GetHeaderDict());
+                request.SetRequestHeaders(loginRequestHeaders);
 
                 request.AddParameter("undefined", (_loginRequestSettings.LoginParameterInit + username + "&user.senha=" + password).Trim(), ParameterType.RequestBody);
                 IRestResponse response = await client.ExecutePostTaskAsync(request);
