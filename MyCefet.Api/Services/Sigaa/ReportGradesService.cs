@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using MyCefet.Api.Extensions;
 using MyCefet.Api.Interfaces;
 using MyCefet.Api.Models;
 using MyCefet.Api.Services.Sigaa.Interfaces;
@@ -66,19 +67,21 @@ namespace MyCefet.Api.Services.Sigaa
             if (tables != null)
             {
                 report = new GradesReport();
+                var labelsToRemove = new List<string> { "\n", "\t" };
+
                 foreach (var table in tables)
                 {
-                    var currentSemester = HttpUtility.HtmlDecode(table.SelectSingleNode(".//caption").InnerText).Replace("\n", "").Replace("\t", "").Trim();
+                    var currentSemester = table.SelectNodeByXPathAndIndex(".//caption").RemoveSubStrings(labelsToRemove).GetDecoded();
                     var tbody = table.SelectNodes(".//tbody/tr");
 
                     Semester semester = new Semester();
                     foreach (var tr in tbody)
                     {
-                        var codigo = HttpUtility.HtmlDecode(tr.SelectNodes(".//td")[0].InnerText).Replace("\n", "").Replace("\t", "").Trim();
-                        var nome = HttpUtility.HtmlDecode(tr.SelectNodes(".//td")[1].InnerText).Replace("\n", "").Replace("\t", "").Trim();
-                        var resultado = HttpUtility.HtmlDecode(tr.SelectNodes(".//td")[4].InnerText).Replace("\n", "").Replace("\t", "").Trim();
-                        var faltas = HttpUtility.HtmlDecode(tr.SelectNodes(".//td")[5].InnerText).Replace("\n", "").Replace("\t", "").Trim();
-                        var situacao = HttpUtility.HtmlDecode(tr.SelectNodes(".//td")[6].InnerText).Replace("\n", "").Replace("\t", "").Trim();
+                        var codigo = tr.SelectNodeByXPathAndIndex(".//td", 0).RemoveSubStrings(labelsToRemove).GetDecoded();
+                        var nome = tr.SelectNodeByXPathAndIndex(".//td", 1).RemoveSubStrings(labelsToRemove).GetDecoded();
+                        var resultado = tr.SelectNodeByXPathAndIndex(".//td", 4).RemoveSubStrings(labelsToRemove).GetDecoded();
+                        var faltas = tr.SelectNodeByXPathAndIndex(".//td", 5).RemoveSubStrings(labelsToRemove).GetDecoded();
+                        var situacao = tr.SelectNodeByXPathAndIndex(".//td", 6).RemoveSubStrings(labelsToRemove).GetDecoded();
 
                         semester.Subjects.Add(new Subject(codigo, nome, resultado, faltas, situacao));
                     }
