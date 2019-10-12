@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using MyCefet.Api.Extensions;
 using MyCefet.Api.Interfaces;
 using MyCefet.Api.Models;
 using MyCefet.Api.Services.Sigaa.Interfaces;
@@ -58,17 +59,18 @@ namespace MyCefet.Api.Services.Sigaa
         {
             var htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html);
+            var labelsToRemove = new List<string> { "\n", "\t" };
 
-            var name = FixName(htmlDocument.DocumentNode.SelectSingleNode(".//p[@class = 'info-docente']").InnerText.Replace("\n", "").Replace("\t", "").Trim());
+            var name = FixName(htmlDocument.DocumentNode.SelectNodeByXPathAndIndex(".//p[@class = 'info-docente']").RemoveSubStrings(labelsToRemove).GetDecoded());
             var table = htmlDocument.DocumentNode.SelectNodes(".//div[@id = 'agenda-docente']/table/tr");
 
             Dictionary<string, string> infos = new Dictionary<string, string>();
 
-            var matricula = HttpUtility.HtmlDecode(table[0].SelectNodes(".//td")[1].InnerText).Replace("\n", "").Replace("\t", "").Trim();
-            var curso = HttpUtility.HtmlDecode(table[1].SelectNodes(".//td")[1].InnerText).Replace("\n", "").Replace("\t", "").Trim();
-            var nivel = HttpUtility.HtmlDecode(table[2].SelectNodes(".//td")[1].InnerText).Replace("\n", "").Replace("\t", "").Trim();
-            var status = HttpUtility.HtmlDecode(table[3].SelectNodes(".//td")[1].InnerText).Replace("\n", "").Replace("\t", "").Trim();
-            var entrada = HttpUtility.HtmlDecode(table[5].SelectNodes(".//td")[1].InnerText).Replace("\n", "").Replace("\t", "").Trim();
+            var matricula = table[0].SelectNodeByXPathAndIndex(".//td", 1).RemoveSubStrings(labelsToRemove).GetDecoded();           
+            var curso = table[1].SelectNodeByXPathAndIndex(".//td", 1).RemoveSubStrings(labelsToRemove).GetDecoded();
+            var nivel = table[2].SelectNodeByXPathAndIndex(".//td", 1).RemoveSubStrings(labelsToRemove).GetDecoded();
+            var status = table[3].SelectNodeByXPathAndIndex(".//td", 1).RemoveSubStrings(labelsToRemove).GetDecoded();
+            var entrada = table[5].SelectNodeByXPathAndIndex(".//td", 1).RemoveSubStrings(labelsToRemove).GetDecoded();
             var rg = HttpUtility.HtmlDecode(table[8].SelectNodes(".//table/tr")[1].SelectNodes(".//td")[1].InnerText).Replace("\n", "").Replace("\t", "").Trim();
 
             return new Student(name, matricula, curso, nivel, status, entrada, rg);
